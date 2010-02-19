@@ -1,0 +1,215 @@
+<action-sequence>
+	<name>lineChart.xaction</name>
+	<version>1</version>
+	<title>Line Chart</title>	
+    <logging-level>debug</logging-level>
+	<documentation>
+		<author>Suja</author>
+		<description>Line Chart</description>
+		<icon></icon>
+		<help/>
+		<result-type>report</result-type>
+	</documentation>
+
+	<inputs>
+		<P_STATUS  type="string"> 
+	      <sources> 
+	        <request>P_STATUS</request> 
+	      </sources> 
+	      <default-value><![CDATA[0]]></default-value>  
+    	</P_STATUS>
+		<P_STATE  type="string"> 
+	      <sources> 
+	        <request>P_STATE</request> 
+	      </sources> 
+	      <default-value><![CDATA[0]]></default-value>  
+    	</P_STATE>
+	    <chart_type type="string"> 
+	      <sources> 
+	        <request>chart_type</request> 
+	      </sources>  
+	      <default-value><![CDATA[line]]></default-value> 
+	    </chart_type>
+	    <chart_height type="string"> 
+	      <sources> 
+	        <request>chart_height</request> 
+	      </sources>  
+	      <default-value><![CDATA[300]]></default-value> 
+	    </chart_height>  
+	    <amc_url type="string"> 
+	      <sources> 
+	        <request>amc_url</request> 
+	      </sources>  
+	      <default-value><![CDATA[/pentaho/amcharts/amline.swf]]></default-value> 
+	    </amc_url>  
+	    <x_label type="string"> 
+	      <sources> 
+	        <request>x_label</request> 
+	      </sources>  
+	      <default-value><![CDATA[col1]]></default-value> 
+	    </x_label>  
+	    <chart_width type="string"> 
+	      <sources> 
+	        <request>chart_width</request> 
+	      </sources>  
+	      <default-value><![CDATA[810]]></default-value> 
+	    </chart_width>  
+	    <chart_settings type="string"> 
+	      <sources> 
+	        <request>chart_template_string</request> 
+	      </sources>  
+	      <default-value><![CDATA[/pentaho/amcharts/sample/amline_settings.xml]]></default-value> 
+	    </chart_settings> 
+	     <csv_separator type="string"> 
+	      <sources> 
+	        <request>csv_separator</request> 
+	      </sources>  
+	      <default-value><![CDATA[;]]></default-value> 
+	    </csv_separator> 
+  </inputs>
+  
+  <outputs> 
+ 	<html_fragment type="string"> 
+      <destinations> 
+		<response>content</response> 
+      </destinations> 
+    </html_fragment> 
+  </outputs>
+  
+  <resources> 
+  </resources>
+  
+  <actions> 
+  	<actions> 
+  	  <condition><![CDATA[P_STATUS == "0" && P_STATE == "0"]]></condition>	
+ 	  <action-definition> 
+        <component-name>SQLLookupRule</component-name>
+        <action-type>Relational</action-type>
+        <action-inputs> 
+      	  <P_STATUS type="string"/>
+      	  <P_STATE type="string"/>
+        </action-inputs>
+        <action-outputs> 
+          <query-result type="result-set" mapping="chart_dataset"/> 
+        </action-outputs>
+        <component-definition> 
+          <jndi><![CDATA[testDB]]></jndi>  
+          <live><![CDATA[false]]></live>
+          <query>
+        	<![CDATA[
+        	SELECT date_purchase_date,
+			     count(*) AS count 
+			FROM  b 
+			GROUP BY date_purchase_date 
+			]]>
+	      </query> 
+		</component-definition> 
+	  </action-definition>
+  	</actions> 
+  	
+  	<actions> 
+      <condition><![CDATA[P_STATUS != "0" && P_STATE != "0"]]></condition>
+ 	  <action-definition> 
+        <component-name>SQLLookupRule</component-name>
+        <action-type>Relational</action-type>
+        <action-inputs> 
+      	  <P_STATUS type="string"/>
+      	  <P_STATE type="string"/>
+        </action-inputs>
+        <action-outputs> 
+          <query-result type="result-set" mapping="chart_dataset"/> 
+        </action-outputs>
+        <component-definition> 
+          <jndi><![CDATA[testDB]]></jndi>  
+          <live><![CDATA[false]]></live>
+          <query>
+        	<![CDATA[
+        	SELECT date_purchase_date,
+			     count(*) AS count 
+			FROM  b 
+			WHERE purchase_status='{P_STATUS}' AND area_code_region='{P_STATE}'
+			GROUP BY date_purchase_date 
+			]]>
+	      </query> 
+		</component-definition> 
+	  </action-definition>
+  	</actions>
+  	 
+  	<actions> 
+      <condition><![CDATA[P_STATUS == "0" && P_STATE != "0"]]></condition>
+ 	  <action-definition> 
+        <component-name>SQLLookupRule</component-name>
+        <action-type>Relational</action-type>
+        <action-inputs> 
+      	  <P_STATUS type="string"/>
+      	  <P_STATE type="string"/>
+        </action-inputs>
+        <action-outputs> 
+          <query-result type="result-set" mapping="chart_dataset"/> 
+        </action-outputs>
+        <component-definition> 
+          <jndi><![CDATA[testDB]]></jndi>  
+          <live><![CDATA[false]]></live>
+          <query>
+        	<![CDATA[
+        	SELECT date_purchase_date,
+			     count(*) AS count 
+			FROM  b 
+			WHERE area_code_region='{P_STATE}'
+			GROUP BY date_purchase_date 
+			]]>
+	      </query> 
+		</component-definition> 
+	  </action-definition>
+  	</actions>
+  	 
+  	<actions> 
+      <condition><![CDATA[P_STATUS != "0" && P_STATE == "0"]]></condition>
+ 	  <action-definition> 
+        <component-name>SQLLookupRule</component-name>
+        <action-type>Relational</action-type>
+        <action-inputs> 
+      	  <P_STATUS type="string"/>
+      	  <P_STATE type="string"/>
+        </action-inputs>
+        <action-outputs> 
+          <query-result type="result-set" mapping="chart_dataset"/> 
+        </action-outputs>
+        <component-definition> 
+          <jndi><![CDATA[testDB]]></jndi>  
+          <live><![CDATA[false]]></live>
+          <query>
+        	<![CDATA[
+        	SELECT date_purchase_date,
+			     count(*) AS count 
+			FROM  b 
+			WHERE purchase_status='{P_STATUS}'
+			GROUP BY date_purchase_date 
+			]]>
+	      </query> 
+		</component-definition> 
+	  </action-definition>
+  	</actions>
+  	 
+    <action-definition> 
+      <component-name>com.immedia.pentaho.plugin.amchart.AMChartComponent</component-name>
+      <action-type>Open Flash Chart</action-type>
+      <action-inputs> 
+	  <chart_template_string type="string"/>  
+        <chart_settings type="string"/>  
+        <chart_dataset type="result-set"/>  
+        <chart_width type="string"/>  
+        <chart_height type="string"/> 
+	<amc_url type="string"/> 
+	<x_label type="string"/> 
+	<csv_separator type="string" />
+	<chart_type type="string" />
+      </action-inputs>
+      <action-outputs> 
+        <html_fragment type="string"/>  
+        <content_url type="string"/> 
+      </action-outputs>
+      <component-definition/> 
+    </action-definition>
+  </actions>
+</action-sequence>
